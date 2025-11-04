@@ -53,10 +53,6 @@ int main() {
 		in_degree[next]++;
 	}
 
-	for(int i = 1; i <= n; i++) {
-		sort(info[i].begin(), info[i].end());
-	}
-
 	find_order(n, info, in_degree);
 
 	return 0;
