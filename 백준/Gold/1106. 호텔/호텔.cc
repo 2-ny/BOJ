@@ -6,6 +6,22 @@ using namespace std;
 
 const int INF = 1e9;
 
+void find_min_cost(int c, int n, int max_new, const vector<pair<int, int>>& info, vector<int>& min_costs) {
+
+	min_costs[0] = 0;
+
+	for(int i = 1; i < c + max_new; i++) {
+		for(int j = 1; j <= n; j++) {
+			int cost = info[j].first;
+			int new_c = info[j].second;
+
+			if(i >= new_c) {
+				min_costs[i] = min(min_costs[i], min_costs[i - new_c] + cost);
+			}
+		}
+	}
+}
+
 int main() {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
@@ -37,5 +53,4 @@ int main() {
 	cout << min_cost << "\n";
 
 	return 0;
-
 }
