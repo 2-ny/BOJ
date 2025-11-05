@@ -6,16 +6,6 @@ using namespace std;
 
 const int INF = 1e9;
 
-void base_case(int n, const vector<pair<int, int>>& info, vector<int>& min_costs) {
-	
-	for(int i = 1; i <= n; i++) {
-		int cost = info[i].first;
-		int new_c = info[i].second;
-
-		min_costs[new_c] = min(min_costs[new_c], cost);
-	}
-}
-
 void find_min_cost(int c, int n, int max_new, const vector<pair<int, int>>& info, vector<int>& min_costs) {
 
 	min_costs[0] = 0;
