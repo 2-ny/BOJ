@@ -20,25 +20,12 @@ struct UnionFind {
 	vector<int> parent;
 	int edges_count;
 
-	UnionFind(int n, int m) {
+	UnionFind(int n) {
 		parent.resize(n + 1);
 
 		iota(parent.begin(), parent.end(), 0);
 
 		edges_count = 0;
-
-		for(int i = 0; i < m; i++) {
-			int a, b;
-			cin >> a >> b;
-
-			int rootA = find(a);
-			int rootB = find(b);
-
-			if(rootA != rootB) {
-				merge(rootA, rootB);
-				edges_count++;
-			}
-		}
 	}
 
 	int find(int a) {
@@ -49,31 +36,30 @@ struct UnionFind {
 		return parent[a] = find(parent[a]);
 	}
 
-	void merge(int rootA, int rootB) {
+	bool merge(int a, int b) {
+		int rootA = find(a);
+		int rootB = find(b);
+
 		if(rootA != rootB) {
 			parent[rootA] = rootB;
+			return true;
 		}
+		return false;
 	}
 };
 
-double find_min_dist(int n, int m, vector<Edge>& edges) {
+double find_min_dist(int n, vector<Edge>& edges, UnionFind& uf) {
 	sort(edges.begin(), edges.end());
-
-	UnionFind union_find(n, m);
 
 	double total_dist = 0;
 
 	for(auto edge: edges) {
-		int rootA = union_find.find(edge.u);
-		int rootB = union_find.find(edge.v);
-		
-		if(rootA != rootB) {
-			union_find.merge(rootA, rootB);
-			union_find.edges_count++;
-			total_dist += edge.dist;
+		if(uf.merge(edge.u, edge.v)) {
+			total_dist+= edge.dist;
+			uf.edges_count++;
 		}
 
-		if(union_find.edges_count == n - 1) {
+		if(uf.edges_count == n - 1) {
 			break;
 		}
 	}
@@ -94,6 +80,16 @@ int main() {
 		cin >> infos[i].first >> infos[i].second;
 	}
 
+	UnionFind uf(n);
+	for(int i = 0; i < m; i++) {
+		int a, b;
+		cin >> a >> b;
+
+		if(uf.merge(a, b)) {
+			uf.edges_count++;
+		}
+	}
+
 	vector<Edge> edges;
 
 	for(int i = 1; i <= n; i++) {
@@ -107,7 +103,7 @@ int main() {
 		}
 	}
 
-	double min_dist = find_min_dist(n, m, edges);
+	double min_dist = find_min_dist(n, edges, uf);
 
 	printf("%.2f\n", min_dist);
 
