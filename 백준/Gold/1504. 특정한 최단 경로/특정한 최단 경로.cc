@@ -62,27 +62,26 @@ int main() {
     find_min_dist(u, n, adj, dist_from_u);
     find_min_dist(v, n, adj, dist_from_v);
 
-    if(dist_from_u[v] != INF) {
-        int min_dist = dist_from_u[v];
-
-        if(dist_from_1[u] != INF && dist_from_v[n] != INF) {
-            if(dist_from_1[v] != INF && dist_from_u[n] != INF) {
-                min_dist += min(dist_from_1[u] + dist_from_v[n], dist_from_1[v] + dist_from_u[n]);
-            }
-            else {
-                min_dist += dist_from_1[u] + dist_from_v[n];
-            }
-            
-            cout << min_dist << "\n";
-            return 0;
-        }
-        else if(dist_from_1[v] != INF && dist_from_u[n] != INF) {
-            min_dist += dist_from_1[v] + dist_from_u[n];
-            cout << min_dist << "\n";
-            return 0;
-        }
+    // 경로 1: 1 -> u -> v -> n
+    long long path1 = (long long)INF + INF + INF;
+    if(dist_from_1[u] != INF && dist_from_u[v] != INF && dist_from_v[n] != INF) {
+        path1 = (long long)dist_from_1[u] + dist_from_u[v] + dist_from_v[n];
     }
 
-    cout << - 1 << "\n";
+    // 경로 2: 1 -> v -> u -> n
+    long long path2 = (long long)INF + INF + INF;
+    if(dist_from_1[v] != INF && dist_from_v[u] != INF && dist_from_u[n] != INF) {
+        path2 = (long long)dist_from_1[v] + dist_from_v[u] + dist_from_u[n];
+    }
+
+    long long answer = min(path1, path2);
+
+    if(answer >= INF) {
+        cout << - 1 << "\n";
+    }
+    else {
+        cout << answer << "\n";
+    }
+
     return 0;
 }
