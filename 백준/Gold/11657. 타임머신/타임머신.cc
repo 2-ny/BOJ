@@ -7,10 +7,6 @@ const long long INF = 1e18;
 
 struct Edge {
 	int u, v, weight;
-
-	bool operator<(const Edge& other) const {
-		return weight < other.weight;
-	}
 };
 
 bool find_minus_cycle(int start_node, int n, const vector<Edge>& edges, vector<long long>& dist) {
@@ -19,7 +15,7 @@ bool find_minus_cycle(int start_node, int n, const vector<Edge>& edges, vector<l
 
 	// n - 1번 수행
 	for(int i = 0; i < n - 1; i++) {
-		for(const auto edge: edges) {
+		for(const auto& edge: edges) {
 			if(dist[edge.u] == INF) {
 				continue;
 			}
@@ -31,7 +27,7 @@ bool find_minus_cycle(int start_node, int n, const vector<Edge>& edges, vector<l
 	}
 
 	// n번째 다시 모든 간선 조사
-	for(const auto edge: edges) {
+	for(const auto& edge: edges) {
 		if(dist[edge.u] == INF) {
 			continue;
 		}
