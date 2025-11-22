@@ -1,7 +1,5 @@
 #include <iostream>
-#include <stack>
 #include <string>
-#include <cmath>
 
 using namespace std;
 
@@ -12,28 +10,14 @@ int main() {
 	string line;
 	cin >> line;
 
-	stack<int> combine;
+	int operand = 0;
 	int answer = 0;
 	bool minus = false;
 	
-	for(int i = 0; i < line.length(); i++) {
-		if(line[i] != '+' && line[i] != '-') {
-			int num = line[i] - '0';
-			combine.push(num);
-			//cout << "push" << num << "\n";
-		}
+	for(int i = 0; i <= line.length(); i++) {
 
-		// 마지막 숫자일 때도 연산에 포함
-		if(line[i] == '+' || line[i] == '-' || i == line.length() - 1) {
-			int operand = 0;
-			int count = 0;
-			while(!combine.empty()) {
-				operand += combine.top() * pow(10, count);
-				//cout << "operand" << operand << "\n";
-				combine.pop();
-				count++;
-			}
-			
+		if(line[i] == '+' || line[i] == '-' || i == line.length()) {
+
 			if(minus == true) {
 				answer -= operand;
 			}
@@ -44,6 +28,12 @@ int main() {
 			if(line[i] == '-') {
 				minus = true;
 			}
+
+			operand = 0;
+		}
+
+		else {
+			operand = (operand * 10) + (line[i] -'0');
 		}
 	}
 
