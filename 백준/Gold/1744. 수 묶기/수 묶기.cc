@@ -3,22 +3,7 @@
 
 using namespace std;
 
-void calc_minus(priority_queue<int, vector<int>, greater<int>>& pq_minus, bool& zero, int& total_sum) {
-	
-	if(pq_minus.empty()) {
-		return;
-	}
-	else if(pq_minus.size() == 1) {
-		if(zero == true) {
-			// 0이 있을 경우 0과 묶는다.
-			return;
-		}
-
-		total_sum += pq_minus.top();
-		pq_minus.pop();
-
-		return;
-	}
+void calc_minus(priority_queue<int, vector<int>, greater<int>>& pq_minus, bool& has_zero, int& total_sum) {
 
 	while(pq_minus.size() > 1) {
 		int min_1 = pq_minus.top();
@@ -31,8 +16,7 @@ void calc_minus(priority_queue<int, vector<int>, greater<int>>& pq_minus, bool& 
 		total_sum += tie;
 	}
 
-	// 우선순위 큐 사이즈가 홀수일 경우 -> 한 개 남음
-	if(pq_minus.size() == 1 && zero == false) {
+	if(!pq_minus.empty() && !has_zero) {	// 우선순위 큐 사이즈 1일 경우 && 0이 없는 경우
 		total_sum += pq_minus.top();
 		pq_minus.pop();
 	}
@@ -42,28 +26,18 @@ void calc_minus(priority_queue<int, vector<int>, greater<int>>& pq_minus, bool& 
 
 void calc_plus(priority_queue<int>& pq_plus, int& total_sum) {
 	
-	if(pq_plus.empty()) {
-		return;
-	}
-	else if(pq_plus.size() == 1) {
-		total_sum += pq_plus.top();
-		pq_plus.pop();
-
-		return;
-	}
-
 	while(pq_plus.size() > 1) {
-		int min_1 = pq_plus.top();
+		int max_1 = pq_plus.top();
 		pq_plus.pop();
 
-		int min_2 = pq_plus.top();
+		int max_2 = pq_plus.top();
 		pq_plus.pop();
 
-		int tie = min_1 * min_2;
+		int tie = max_1 * max_2;
 		total_sum += tie;
 	}
 
-	if(pq_plus.size() == 1) {
+	if(!pq_plus.empty()) {
 		total_sum += pq_plus.top();
 		pq_plus.pop();
 	}
@@ -82,7 +56,7 @@ int main() {
 	priority_queue<int> pq_plus;	// 양수 저장
 	
 	int total_sum = 0;
-	bool zero = false;
+	bool has_zero = false;
 
 	for(int i = 0; i < n; i++) {
 		int temp;
@@ -95,14 +69,14 @@ int main() {
 			pq_plus.push(temp);
 		}
 		else if(temp == 1) {
-			total_sum++;
+			total_sum++;	// 1은 곱하면 손해
 		}
-		else {	// temp == 0 일 경우
-			zero = true;	// 음수의 개수가 홀수일 경우 0과 묶으면 최대가 됨.
+		else {	// temp == 0
+			has_zero = true;	// 음수의 개수가 홀수일 경우 0과 묶으면 최대가 됨.
 		}
 	}
 
-	calc_minus(pq_minus, zero, total_sum);
+	calc_minus(pq_minus, has_zero, total_sum);
 
 	calc_plus(pq_plus, total_sum);
 
