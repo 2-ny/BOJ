@@ -1,69 +1,44 @@
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <algorithm>
 
 using namespace std;
 
-struct Day {
-	int start_month, start_day, end_month, end_day;
+struct Flower {
+	int start, end;	// month * 100 + day로 변환해서 저장
 };
 
-bool compare(const Day& a, const Day& b) {
-	if(a.start_month == b.start_month) {
-		return a.start_day < b.start_day;
-	}
-
-	return a.start_month < b.start_month;
+// 시작일 기준 오름차순 정렬
+bool compare(const Flower& a, const Flower& b) {
+	return a.start < b.start;
 }
 
-void solution(int n, vector<Day>& info) {
-	sort(info.begin(), info.end(), compare);
+void solution(int n, vector<Flower>& flowers) {
+	sort(flowers.begin(), flowers.end(), compare);
 
-	// max-heap에 {마지막 달, 마지막 날} 저장
-	priority_queue<pair<int, int>> pq;
-	int count = 0;	// 선택한 꽃 개수 count
-	int start_num = 0;
+	int current_end = 301;	// 현재 커버된 마지막 날짜 (3월 1일)
+	int count = 0;	// 심은 꽃 개수
+	int index = 0;	// 후보 탐색할 인덱스
 
-	for(int i = 0; i < n; i++) {
-		if(info[i].start_month < 3 || (info[i].start_month == 3 && info[i].start_day == 1)) {
-			pq.push({info[i].end_month, info[i].end_day});
-			start_num++;
+	// 11월 30일을 넘기는 것이 목표
+	while(current_end <= 1130) {
+		int max_end = 0;	// 이번 턴에 갱신할 수 있는 최대 종료일
+		bool found = false;	// 후보 있는지 체크
+		
+		while(index < n && flowers[index].start <= current_end) {
+			max_end = max(max_end, flowers[index].end);
+			found = true;
+			index++;
 		}
 
-		else {
-			break;
+		// 후보가 없거나, 날짜가 안 늘어나는 경우 실패
+		if(!found || max_end <= current_end) {
+			cout << 0 << "\n";
+			return;
 		}
-	}
 
-	int last_month = 3;
-	int last_day = 1;
-
-	while(!pq.empty()) {
-		last_month = pq.top().first;
-		last_day = pq.top().second;
-		pq.pop();
+		current_end = max_end;	// 가장 늦게 지는 꽃 선택 확정
 		count++;
-
-		if(last_month == 12) {
-			break;
-		}
-
-		for(int i = start_num; i < n; i++) {
-			if(info[i].start_month < last_month || (info[i].start_month == last_month && info[i].start_day <= last_day)) {
-				pq.push({info[i].end_month, info[i].end_day});
-				start_num++;
-			}
-			
-			else {
-				break;
-			}
-		}
-	}
-	
-	if(last_month != 12) {
-		cout << 0 << "\n";
-		return;
 	}
 
 	cout << count << "\n";
@@ -76,16 +51,16 @@ int main() {
 	int n;
 	cin >> n;
 
-	vector<Day> info;
+	vector<Flower> flowers;
 
 	for(int i = 0; i < n; i++) {
 		int start_month, start_day, end_month, end_day;
 		cin >> start_month >> start_day >> end_month >> end_day;
 
-		info.push_back({start_month, start_day, end_month, end_day});
+		flowers.push_back({start_month * 100 + start_day, end_month * 100 + end_day});
 	}
 
-	solution(n, info);
+	solution(n, flowers);
 
 	return 0;
 }
