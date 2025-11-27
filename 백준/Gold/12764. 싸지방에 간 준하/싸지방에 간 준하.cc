@@ -12,52 +12,55 @@ struct Time {
 };
 
 bool compare(const Time& a, const Time& b) {
-	if(a.start == b.start) {
-		return a.end < b.end;
-	}
-
 	return a.start < b.start;
 }
 
 void solution(int n, vector<Time>& time_info) {
 	sort(time_info.begin(), time_info.end(), compare);
 
-	// {종료 시간, 사용한 자리} min-heap에 저장
-	priority_queue<int, vector<int>, greater<int>> pq;
-	pq.push({time_info[0].end});
-	int max_seats = 1;
+	// {종료 시간, 사용한 자리} min-heap
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> seats_using;
+	// {자리 번호} min-heap
+	priority_queue<int, vector<int>, greater<int>> seats_empty;
 
-	vector<pair<int, int>> seats;	// 각 자리의 {종료 시간, 이용자 수} 저장, 1-based
-	seats.push_back({INF, 0});	// 1-based 만들기 위해
-	seats.push_back({time_info[0].end, 1});
+	// 자리별 이용 횟수
+	vector<int> seats_count(n + 1, 0);
 
-	for(int i = 1; i < n; i++) {
-		int min_end_time = pq.top();
+	int max_seats = 0;	// 현재까지 개설된 총 좌석 수
+
+	for(int i = 0; i < n; i++) {
 		int start = time_info[i].start;
 		int end = time_info[i].end;
 
-		if(start < min_end_time) {
+		// 1. 청소 -> 현재 이용자가 오기 전에 끝난 사람들을 모두 내보냄
+		while(!seats_using.empty() && seats_using.top().first <= start) {
+			seats_empty.push(seats_using.top().second);	// 자리 비움
+			seats_using.pop();
+		}
+
+		// 2. 배정 -> 자리 앉히기
+		int current_seat_index;
+
+		if(seats_empty.empty()) {
+			// 빈 자리가 없는 경우 새 자리 개설
 			max_seats++;
-			seats.push_back({end, 1});
+			current_seat_index = max_seats;
 		}
 		else {
-			pq.pop();
-			for(int i = 1; i <= max_seats; i++) {
-				if(start > seats[i].first) {
-					seats[i].first = end;
-					seats[i].second += 1;
-					break;
-				}
-			}
+			// 가장 번호가 작은 자리 재사용
+			current_seat_index = seats_empty.top();
+			seats_empty.pop();
 		}
-		
-		pq.push(end);
+
+		// 3. 등록 -> 사용 정보 업데이트
+		seats_using.push({end, current_seat_index});
+		seats_count[current_seat_index]++;
 	}
 
 	cout << max_seats << "\n";
 
 	for(int i = 1; i <= max_seats; i++) {
-		cout << seats[i].second << " ";
+		cout << seats_count[i] << " ";
 	}
 	cout << "\n";
 }
