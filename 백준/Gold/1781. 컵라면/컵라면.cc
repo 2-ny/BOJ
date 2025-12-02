@@ -10,32 +10,27 @@ struct Problem {
 };
 
 bool compare(const Problem& a, const Problem& b) {
-	return a.deadline > b.deadline;
+	return a.deadline < b.deadline;
 }
 
 void find_max_cupNoodles(int n, int max_deadline, vector<Problem>& problems) {
-	sort(problems.begin(), problems.end(), compare);	// deadline 내림차순
+	sort(problems.begin(), problems.end(), compare);	// deadline 오름차순
 
-	int max_cupNoodles = 0;
-	int index = 0;	// 0-based
-	priority_queue<int> cupNoodles;	// 컵라면 max-heap
+	priority_queue<int, vector<int>, greater<int>> cupNoodles;	// 컵라면 min-heap
 
-	for(int time = max_deadline; time >= 1; time--) {
-		for(int i = index; i < n; i++) {
-			if(problems[i].deadline >= time) {
-				cupNoodles.push(problems[i].cupNoodle);
-				// cout << "time: " << time << " push: " << problems[i].cupNoodle << "\n";
-				index++;
-			}
-			else {
-				break;
-			}
-		}
-		
-		if(!cupNoodles.empty()) {
-			max_cupNoodles += cupNoodles.top();
+	for(auto problem: problems) {
+		cupNoodles.push(problem.cupNoodle);
+
+		if(cupNoodles.size() > problem.deadline) {
 			cupNoodles.pop();
 		}
+	}
+
+	int max_cupNoodles = 0;
+
+	while(!cupNoodles.empty()) {
+		max_cupNoodles += cupNoodles.top();
+		cupNoodles.pop();
 	}
 
 	cout << max_cupNoodles << "\n";
