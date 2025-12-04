@@ -5,55 +5,37 @@
 
 using namespace std;
 
+const int INF = 2e9;
+
 void solution(int n, vector<int>& solutions) {
 	sort(solutions.begin(), solutions.end());	// 오름차순 정렬
 
-	if(solutions[0] >= 0) {
-		// 모든 용액이 0 또는 양수일 경우 0번째, 1번째 용액을 혼합
-		cout << solutions[0] << " " << solutions[1] << "\n";
-		return;
-	}
-	else if(solutions[n - 1] <= 0) {
-		// 모든 용액이 음수 또는 0일 경우 n - 2번째, n - 1번째 용액을 혼합
-		cout << solutions[n - 2] << " " << solutions[n - 1] << "\n";
-		return;
-	}
-
-	// 양수, 음수 용액이 모두 존재하는 경우
 	int left = 0, right = n - 1;
-	int sum = solutions[left] + solutions[right];
-	int min_value = abs(sum);
-	int min_left = 0, min_right = n - 1;
+	int min_abs = INF;
+	int answer_left = 0, answer_right = 0;
 
 	while(left < right) {
+		int sum = solutions[left] + solutions[right];
+
+		if(abs(sum) < min_abs) {
+			min_abs = abs(sum);
+			answer_left = solutions[left];
+			answer_right = solutions[right];
+
+			if(sum == 0) {
+				break;
+			}
+		}
+
 		if(sum > 0) {
 			right--;
 		}
 		else if(sum < 0) {
 			left++;
 		}
-
-		if(left == right) {
-			break;
-		}
-
-		sum = solutions[left] + solutions[right];
-
-		if(sum == 0) {
-			// sum == 0 -> 종료
-			cout << solutions[left] << " " << solutions[right] << "\n";
-			return;
-		}
-
-		if(abs(sum) < min_value) {
-			min_left = left;
-			min_right = right;
-
-			min_value = abs(sum);
-		}
 	}
 
-	cout << solutions[min_left] << " " << solutions[min_right] << "\n";
+	cout << answer_left << " " << answer_right << "\n";
 }
 
 int main() {
