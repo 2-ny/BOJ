@@ -3,84 +3,70 @@
 
 using namespace std;
 
-void calc_minus(priority_queue<int, vector<int>, greater<int>>& pq_minus, bool& has_zero, int& total_sum) {
+void solution(int sequence_sum, priority_queue<int, vector<int>, greater<int>>& negative_min_q, priority_queue<int>& positive_max_q) {
 
-	while(pq_minus.size() > 1) {
-		int min_1 = pq_minus.top();
-		pq_minus.pop();
+	while(negative_min_q.size() > 1) {
+		int minA = negative_min_q.top();
+		negative_min_q.pop();
 
-		int min_2 = pq_minus.top();
-		pq_minus.pop();
+		int minB = negative_min_q.top();
+		negative_min_q.pop();
 
-		int tie = min_1 * min_2;
-		total_sum += tie;
+		sequence_sum += (minA * minB);
 	}
 
-	if(!pq_minus.empty() && !has_zero) {	// 우선순위 큐 사이즈 1일 경우 && 0이 없는 경우
-		total_sum += pq_minus.top();
-		pq_minus.pop();
+	if(!negative_min_q.empty()) {
+		sequence_sum += negative_min_q.top();
+		negative_min_q.pop();
 	}
 
-	return;
-}
+	while(positive_max_q.size() > 1) {
+		int maxA = positive_max_q.top();
+		positive_max_q.pop();
 
-void calc_plus(priority_queue<int>& pq_plus, int& total_sum) {
-	
-	while(pq_plus.size() > 1) {
-		int max_1 = pq_plus.top();
-		pq_plus.pop();
+		int maxB = positive_max_q.top();
+		positive_max_q.pop();
 
-		int max_2 = pq_plus.top();
-		pq_plus.pop();
-
-		int tie = max_1 * max_2;
-		total_sum += tie;
+		sequence_sum += (maxA * maxB);
 	}
 
-	if(!pq_plus.empty()) {
-		total_sum += pq_plus.top();
-		pq_plus.pop();
+	if(!positive_max_q.empty()) {
+		sequence_sum += positive_max_q.top();
+		positive_max_q.pop();
 	}
-
-	return;
+	 
+	cout << sequence_sum << "\n";
 }
 
 int main() {
-	ios_base::sync_with_stdio(false);	
+	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
 
 	int n;
 	cin >> n;
 
-	priority_queue<int, vector<int>, greater<int>> pq_minus;	// 음수 저장
-	priority_queue<int> pq_plus;	// 양수 저장
-	
-	int total_sum = 0;
-	bool has_zero = false;
+	priority_queue<int, vector<int>, greater<int>> negative_min_q;	// 음수 min-heap
+	priority_queue<int> positive_max_q;	// 1 보다 큰 양수 max-heap
+
+	int sequence_sum = 0;
 
 	for(int i = 0; i < n; i++) {
-		int temp;
-		cin >> temp;
+		int term;
+		cin >> term;
 
-		if(temp < 0) {
-			pq_minus.push(temp);
+		if(term <= 0) {
+			negative_min_q.push(term);
 		}
-		else if(temp > 1) {	
-			pq_plus.push(temp);
+		else if(term > 1) {
+			positive_max_q.push(term);
 		}
-		else if(temp == 1) {
-			total_sum++;	// 1은 곱하면 손해
-		}
-		else {	// temp == 0
-			has_zero = true;	// 음수의 개수가 홀수일 경우 0과 묶으면 최대가 됨.
+		else {
+			// term == 1
+			sequence_sum++;
 		}
 	}
 
-	calc_minus(pq_minus, has_zero, total_sum);
-
-	calc_plus(pq_plus, total_sum);
-
-	cout << total_sum << "\n";
+	solution(sequence_sum, negative_min_q, positive_max_q);
 
 	return 0;
 }
