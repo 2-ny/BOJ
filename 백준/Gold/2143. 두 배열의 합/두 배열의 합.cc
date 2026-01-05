@@ -4,6 +4,48 @@
 
 using namespace std;
 
+int find_lower_bound(long long target, vector<long long>& sum_B) {
+	int low = 0;
+	int high = sum_B.size() - 1;
+
+	int result = sum_B.size();
+
+	while(low <= high) {
+		int mid = low + (high - low) / 2;
+
+		if(sum_B[mid] >= target) {
+			result = mid;
+			high = mid - 1;
+		}
+		else {
+			low = mid + 1;
+		}
+	}
+
+	return result;
+}
+
+int find_upper_bound(long long target, vector<long long>& sum_B) {
+	int low = 0;
+	int high = sum_B.size() - 1;
+
+	int result = sum_B.size();
+
+	while(low <= high) {
+		int mid = low + (high - low) / 2;
+
+		if(sum_B[mid] > target) {
+			result = mid;
+			high = mid - 1;
+		}
+		else {
+			low = mid + 1;
+		}
+	}
+
+	return result;
+}
+
 int main() {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
@@ -51,20 +93,45 @@ int main() {
 		}
 	}
 
+	sort(sum_A.begin(), sum_A.end());
 	sort(sum_B.begin(), sum_B.end());
 
-	long long count = 0;
+	int ptrA = 0;
+	int ptrB = sum_B.size() - 1;
+	long long answer = 0;
 
-	for(auto a : sum_A) {
-		long long target = t - a;
+	while(ptrA < sum_A.size() && ptrB >= 0) {
+		long long current_sum = sum_A[ptrA] + sum_B[ptrB];
 
-		auto low = lower_bound(sum_B.begin(), sum_B.end(), target);
-		auto up = upper_bound(sum_B.begin(), sum_B.end(), target);
+		if(current_sum == t) {
+			// 중복 개수 세기
+			long long targetA = sum_A[ptrA];
+			long long cntA = 0;
 
-		count += (up - low);
+			while(ptrA < sum_A.size() && sum_A[ptrA] == targetA) {
+				ptrA++;
+				cntA++;
+			}
+
+			long long targetB = sum_B[ptrB];
+			long long cntB = 0;
+
+			while(ptrB >= 0 && sum_B[ptrB] == targetB) {
+				ptrB--;
+				cntB++;
+			}
+
+			answer += (cntA * cntB);
+		}
+		else if(current_sum < t) {
+			ptrA++;
+		}
+		else {
+			ptrB--;
+		}
 	}
 
-	cout << count << "\n";
-
+	cout << answer << "\n";
+	
 	return 0;
 }
