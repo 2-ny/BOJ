@@ -30,29 +30,45 @@ int main() {
 	for(int i = 0; i < n; i++) {
 		for(int j = 0; j < n; j++) {
 			sumAB.push_back((long long)A[i] + B[j]);
-		}
-	}
-
-	for(int i = 0; i < n; i++) {
-		for(int j = 0; j < n; j++) {
 			sumCD.push_back((long long)C[i] + D[j]);
 		}
 	}
 
+	sort(sumAB.begin(), sumAB.end());
 	sort(sumCD.begin(), sumCD.end());
 
 	int left = 0;
-	int right = n - 1;
+	int right = sumCD.size() - 1;
 
 	long long count = 0;
 
-	for(auto val : sumAB) {
-		long long target = -val;
+	while(left < sumAB.size() && right >= 0) {
+		long long s1 = sumAB[left];
+		long long s2 = sumCD[right];
+		long long current_sum = s1 + s2;
 
-		auto up = upper_bound(sumCD.begin(), sumCD.end(), target);
-		auto low = lower_bound(sumCD.begin(), sumCD.end(), target);
+		if(current_sum == 0) {
+			long long cnt1 = 0;
+			while(left < sumAB.size() && sumAB[left] == s1) {
+				cnt1++;
+				left++;
+			}
 
-		count += (up - low);
+			long long cnt2 = 0;
+			while(right >= 0 && sumCD[right] == s2) {
+				cnt2++;
+				right--;
+			}
+
+			count += (cnt1 * cnt2);
+		}
+
+		else if(current_sum > 0) {
+			right--;
+		}
+		else {
+			left++;
+		}
 	}
 
 	cout << count << "\n";
